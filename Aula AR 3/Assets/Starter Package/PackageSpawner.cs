@@ -23,7 +23,10 @@ public class PackageSpawner : MonoBehaviour
 {
     public DrivingSurfaceManager DrivingSurfaceManager;
     public PackageBehaviour Package;
-    public GameObject PackagePrefab;
+    public List<GameObject> PackagePrefab;
+    public PackageBehaviour fakeBeha;
+    public GameObject obstaculo;
+
 
     public static Vector3 RandomInTriangle(Vector3 v1, Vector3 v2)
     {
@@ -71,10 +74,20 @@ public class PackageSpawner : MonoBehaviour
 
     public void SpawnPackage(ARPlane plane)
     {
-        var packageClone = GameObject.Instantiate(PackagePrefab);
+        var packageClone = GameObject.Instantiate(PackagePrefab[Random.Range(0, PackagePrefab.Count)]);
         packageClone.transform.position = FindRandomLocation(plane);
 
         Package = packageClone.GetComponent<PackageBehaviour>();
+
+        
+    }
+
+    public void SpawnObstaculo(ARPlane plane)
+    {
+        //PARA O FAKE
+        var fakePackage = GameObject.Instantiate(obstaculo);
+        fakePackage.transform.position = FindRandomLocation(plane);
+        fakeBeha = fakePackage.GetComponent<PackageBehaviour>();
     }
 
     private void Update()
@@ -82,13 +95,18 @@ public class PackageSpawner : MonoBehaviour
         var lockedPlane = DrivingSurfaceManager.LockedPlane;
         if (lockedPlane != null)
         {
-            if (Package == null)
+            if (Package == null || fakeBeha == null) //PARA O FAKE TAMBEM
             {
                 SpawnPackage(lockedPlane);
+                SpawnObstaculo(lockedPlane);
             }
 
             var packagePosition = Package.gameObject.transform.position;
             packagePosition.Set(packagePosition.x, lockedPlane.center.y, packagePosition.z);
+
+            //PARA O FAKE
+            var fakePosition = fakeBeha.gameObject.transform.position;
+            fakePosition.Set(fakePosition.x, lockedPlane.center.y, fakePosition.z);
         }
     }
 }

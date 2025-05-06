@@ -15,6 +15,7 @@
  */
 
 using System.Collections;
+using TMPro;
 using UnityEngine;
 
 /**
@@ -24,6 +25,16 @@ public class CarBehaviour : MonoBehaviour
 {
     public ReticleBehaviour Reticle;
     public float Speed = 1.2f;
+
+    public int pontos = 0;
+    public TextMeshProUGUI txtPontos;
+    
+
+    private void Awake()
+    {
+        txtPontos = GameObject.Find("TxtPontos").GetComponent<TextMeshProUGUI>();
+        txtPontos.text = "Pontos: " + pontos.ToString();
+    }
 
     private void Update()
     {
@@ -45,7 +56,41 @@ public class CarBehaviour : MonoBehaviour
         var Package = other.GetComponent<PackageBehaviour>();
         if (Package != null)
         {
+            if (Package.gameObject.CompareTag("package1"))
+            {
+                pontos += 10;
+            }
+            else if (Package.gameObject.CompareTag("package2"))
+            {
+                pontos += 20;
+            }
+            else if (Package.gameObject.CompareTag("package3"))
+            {
+                pontos += 30;
+            }
+            else if (Package.gameObject.CompareTag("package4"))
+            {
+                pontos += 40;
+            }
+            Debug.Log(Package.gameObject.name + " pontos: " + pontos);
+            txtPontos.text = "Pontos: " + pontos.ToString();
             Destroy(other.gameObject);
+            if (pontos >= 100)
+            {
+                pontos = 100;
+                WinCondition winCon = GameObject.Find("WInLoseCondition").GetComponent<WinCondition>();
+                winCon.pnlVitoria.SetActive(true);
+            }
+            else if (Package.gameObject.CompareTag("obstaculo"))
+            {
+                Debug.Log("Colidiu com: " + Package.name);
+                WinCondition winCon = GameObject.Find("WInLoseCondition").GetComponent<WinCondition>();
+                winCon.pnlDerrota.SetActive(true);
+
+                //Destroy(Package.gameObject);
+                Destroy(gameObject);
+
+            }
         }
     }
 }
